@@ -6,8 +6,18 @@
     border-radius: 6px;
     margin-right: 10px;
     margin-bottom: 10px;
+    float: left;   
+}
+
+.rb_gallery-ImgDbLoad {
+    width: 120px;
+    height: 120px;
+    overflow: hidden;
+    border: 7px solid #cbcbcb;
+    border-radius: 6px;
+    margin-right: 10px;
+    margin-bottom: 10px;
     float: left;
-    
 }
 
 .rb_gallery-no-image {

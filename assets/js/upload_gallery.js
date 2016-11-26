@@ -11,21 +11,25 @@ jQuery(function($){
             multiple: true              
         }).on('select', function() {
             var fotomas = custom_uploader.state().get('selection').toJSON();
-            var fotomasId;
+            var fotoUrl;
+            var fotoId;
             var massive;
             var attachment = custom_uploader.state().get('selection').first().toJSON();
             $(button).parent().prev().attr('src', attachment.url);
             
             $(button).prev().val(attachment.id);
-            var zapis = '0';
+            var fotoMassUrl = '0';
+            var fotoMassId = '0';
             var cast = $.each(fotomas, function(key, value){
-                fotomasId = fotomas[key].url;
-                zapis += ',' + fotomasId ;
+                fotoUrl = fotomas[key].url;
+                fotoId = fotomas[key].id;
+                fotoMassUrl += ',' + fotoUrl ;
+                fotoMassId += ',' + fotoId ;
                 alert(key + ': ' + value);
-                alert(fotomasId);
-                alert(zapis);
-                $("input[name='option1']").val(zapis);
-                massive = zapis.split(',');
+                alert(fotoUrl);
+                alert(fotoMassUrl);
+                $("input[name='rb_gallery-massImgId']").val(fotoMassId);
+                massive = fotoMassUrl.split(',');
                 
             });
             for (var i = 1; i < massive.length; i++) {

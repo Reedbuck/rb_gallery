@@ -37,8 +37,8 @@ function rb_gallery_MenuCreate(){
 
 function rb_gallery_register_settings() {
 	//register our settings
-	register_setting( 'rb-settings-group', 'rb_gallery_type' );
-	register_setting( 'rb-settings-group', 'rb_gallery_icon' );
+	register_setting( 'rb-settings-group', 'rb_gallery-massImgId' );
+	register_setting( 'rb-settings-group', 'rb_gallery-name' );
 }
 
 
@@ -46,7 +46,6 @@ function rb_gallery_register_settings() {
 function rb_gallery_Home(){
     if(!$_GET["dop"]){
 ?>
-<script src="<?php bloginfo('template_url'); ?>/js/jquery.mb.YTPlayer.js"></script>
     <h2>Главная страница</h2>
 
     <form method="get" action="<?php plugins_url('rb_gallery/rb_gallery.php'); ?>">
@@ -64,29 +63,30 @@ function rb_gallery_Home(){
 
         $default = plugins_url('rb_gallery/assets/img/no-image.png');
         
-        if( $value ) {
-            
-		$image_attributes = wp_get_attachment_image_src( $value, array($w, $h) );
-		$src = $image_attributes[0];
-            
-        } else {
-            
-		$src = $default; 
-        
-        }
 ?>
 
     <h2>Дополнительная страница</h2>
     <div>
         <div class="rb_gallery-innerBox">
-            <div id="rb_gallery-inner">        
+            <div id="rb_gallery-inner">
+                <?php 
+                    $massImgId = explode(",", get_option('rb_gallery-massImgId'));
+                    if($massImgId){
+                        for($i = 1; $i < count($massImgId); ++$i){ 
+                        $image_attributes = wp_get_attachment_image_src( $massImgId[$i], array($w, $h) );
+                        $image_src = $image_attributes[0];
+                ?>
+                            <div class="rb_gallery-ImgDbLoad"><img data-src="<?php echo $image_src; ?>" src="<?php echo $image_src; ?>" width="150px" /></div>
+                <?php
+                        }
+                    } 
+                ?>
             </div>
             <div class="rb_gallery-no-image">
                 <img data-src="<?php echo $default ?>" src="<?php echo $default ?>" width="100%" />
             </div>
         </div>
 		<div>
-			<input type="text" name="' . $name . '" id="' . $name . '" value="' . $value . '" />
 			<button type="submit" class="upload_image_button button">Загрузить</button>
 			<button type="submit" class="remove_image_button button">&times;</button>
 		</div>
@@ -94,13 +94,12 @@ function rb_gallery_Home(){
     
     <form method="post" action="options.php">
         <?php settings_fields( 'rb-settings-group' ); ?>
-        <input type="text" name="option1" value="<?php echo get_option('rb_gallery_type'); ?>" />
-        <input type="text" name="option2" value="<?php echo get_option('rb_gallery_icon'); ?>" />
+        <input type="text" name="rb_gallery-massImgId" value="<?php echo get_option('rb_gallery-massImgId'); ?>" />
         <label>Название галлереи
-            <input type="text" name="option2" value="<?php echo get_option('rb_gallery_icon'); ?>" />
+            <input type="text" name="rb_gallery-name" value="<?php echo get_option('rb_gallery-name'); ?>" />
         </label>
         <p class="submit">
-            <input type="submit" class="button-primary" value="Новая кнопка" />
+            <input type="submit" class="button-primary" value="Сохранить" />
         </p>
     </form>
 
