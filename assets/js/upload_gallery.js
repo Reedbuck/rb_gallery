@@ -1,6 +1,6 @@
 jQuery(function($){
    
-	$('.upload_image_button').click(function(e) {  
+	$('.rb_gallery-no-image').click(function(e) {  
         e.preventDefault();                  
         var button = $(this);               
         var custom_uploader = wp.media({ 
@@ -29,7 +29,7 @@ jQuery(function($){
                 
             });
             for (var i = 1; i < massive.length; i++) {
-                var massiveInner = '<img data-src="' + massive[i] + '" src="' + massive[i] + '" width="150px" />';
+                var massiveInner = '<div class="rb_gallery-ImgCash"><img data-src="' + massive[i] + '" src="' + massive[i] + '" width="200px" /></div>';
                 document.getElementById('rb_gallery-inner').innerHTML += massiveInner;
             }
             

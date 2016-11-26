@@ -16,7 +16,8 @@ function true_plugin_init() {
     if ( ! did_action( 'wp_enqueue_media' ) ) {
 		wp_enqueue_media();
 	}
-    wp_enqueue_script('uploadgallery', plugins_url('assets/js/upload_gallery.js', __FILE__), array('jquery'), null, false);
+    wp_enqueue_script('uploadgalleryjs', plugins_url('assets/js/upload_gallery.js', __FILE__), array('jquery'), null, false);
+    wp_enqueue_style('uploadgallerystyle', plugins_url('assets/css/uploadgallerystyle.css', __FILE__));
 }
 
 add_action('admin_menu', 'rb_gallery_MenuCreate');
@@ -77,8 +78,13 @@ function rb_gallery_Home(){
 
     <h2>Дополнительная страница</h2>
     <div>
-        <div id="rb_gallery-inner"></div>
-		<img data-src="<?php echo $default ?>" src="<?php echo $default ?>" width="150px" />
+        <div class="rb_gallery-innerBox">
+            <div id="rb_gallery-inner">        
+            </div>
+            <div class="rb_gallery-no-image">
+                <img data-src="<?php echo $default ?>" src="<?php echo $default ?>" width="100%" />
+            </div>
+        </div>
 		<div>
 			<input type="text" name="' . $name . '" id="' . $name . '" value="' . $value . '" />
 			<button type="submit" class="upload_image_button button">Загрузить</button>

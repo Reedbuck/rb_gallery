@@ -1,0 +1,29 @@
+.rb_gallery-ImgCash {
+    width: 120px;
+    height: 120px;
+    overflow: hidden;
+    border: 7px solid #cbcbcb;
+    border-radius: 6px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    float: left;
+    
+}
+
+.rb_gallery-no-image {
+    border: 7px solid #cbcbcb;
+    border-radius: 6px;
+    width: 120px;
+    height: 120px;
+    cursor: pointer;
+    float: left;
+}
+
+.rb_gallery-innerBox:after {
+    content: ".";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+}
+
