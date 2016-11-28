@@ -12,6 +12,55 @@ License: GPL2
 <?php 
 add_action( 'admin_init', 'true_plugin_init');
 
+global $rb_gallery_db_version;
+$rb_gallery_db_version = "1.0";
+
+function rb_gallery_db_install () {
+   global $wpdb;
+   global $rb_gallery_db_version;
+
+   $table_name = $wpdb->prefix . "rb_gallery";
+   if($wpdb->get_var("show tables like '$table_name'") != $table_name) {
+      
+      $sql = "CREATE TABLE " . $table_name . " (
+	  id smallint unsigned NOT NULL AUTO_INCREMENT,
+      name text NOT NULL,
+	  foto text NOT NULL,
+	  type text NOT NULL,
+	  UNIQUE KEY id (id)
+	);";
+
+      require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+      dbDelta($sql);
+
+      $rows_affected = $wpdb->insert( $table_name, array( 'time' => current_time('mysql'), 'name' => $welcome_name, 'text' => $welcome_text ) );
+ 
+      add_option("rb_gallery_db_version", $rb_gallery_db_version);
+
+   }
+$welcome_name = "Mr. Wordpress";
+  $welcome_text = "Поздравляю, установка прошла успешно!";
+
+  $rows_affected = $wpdb->insert( $table_name, array( 'name' => $welcome_name, 'type' => $welcome_text ) );
+
+}
+
+register_activation_hook(__FILE__,'rb_gallery_db_install');
+
+function rb_gallery_db_uninstall () {
+    global $wpdb;
+    $table_name = $wpdb->prefix . "rb_gallery";
+    
+    $sql = "DROP TABLE " . $table_name . ";";
+    
+    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+    $wpdb->query($sql);
+}
+
+register_deactivation_hook(__FILE__,'rb_gallery_db_uninstall');
+
+
+
 function true_plugin_init() {
     if ( ! did_action( 'wp_enqueue_media' ) ) {
 		wp_enqueue_media();
@@ -30,18 +79,15 @@ function rb_gallery_MenuCreate(){
         
         add_submenu_page( 'rb_gallery', 'RB gallery 1', 'Настройка', 'manage_options', 'rb_gallery_setting', 'rb_gallery_Setting' );
         
-        add_action( 'admin_init', 'rb_gallery_register_settings' );
     }
 }
 
 
-function rb_gallery_register_settings() {
-	//register our settings
-	register_setting( 'rb-settings-group', 'rb_gallery-massImgId' );
-	register_setting( 'rb-settings-group', 'rb_gallery-name' );
-}
-
-
+/*
+*
+* ГЛАВНАЯ
+*
+*/
 
 function rb_gallery_Home(){
     if(!$_GET["dop"]){
@@ -59,7 +105,49 @@ function rb_gallery_Home(){
     </form>
 
 <?php  
+                      
+                      
+/*
+*
+* КОНЕЦ ГЛАВНОЙ
+*
+*/
     } else { 
+/*
+*
+* Регистрация опцый в БД
+*
+*/
+if($_GET['rb_gallery-name']){
+    echo "Есть контакт";
+    
+    $galleryName = $_GET['rb_gallery-name'];
+    $galleryImgId = $_GET['rb_gallery-massImgId'];
+    add_action( 'create_new_gallery', 'rb_gallery_register_settings', 10, 3 );
+    
+    
+    function rb_gallery_register_settings($galleryName, $galleryImgId) {
+        echo "контакт 2";
+        global $wpdb;
+     // подготавливаем данные
+     $galleryName = esc_sql($galleryName);
+     $galleryImgId = esc_sql($galleryImgId);
+        
+     $table_name = $wpdb->prefix . "rb_gallery";
+    // вставляем строку в таблицу
+     $wpdb->insert( $table_name, array( 'name' => $galleryName, 'foto' => $galleryImgId ));
+    }
+    
+    
+    do_action( 'create_new_gallery', $galleryName, $galleryImgId );
+}
+
+/*
+*
+* КОНЕЦ Регистрация опцый в БД
+*
+*/
+
 
         $default = plugins_url('rb_gallery/assets/img/no-image.png');
         
@@ -92,12 +180,14 @@ function rb_gallery_Home(){
 		</div>
 	</div>
     
-    <form method="post" action="options.php">
-        <?php settings_fields( 'rb-settings-group' ); ?>
-        <input type="text" name="rb_gallery-massImgId" value="<?php echo get_option('rb_gallery-massImgId'); ?>" />
+    <form method="get" action="<?php plugins_url('rb_gallery/rb_gallery.php'); ?>">
+        <input type="hidden" name="page" value="rb_gallery" />
+        <input type="hidden" name="dop" value="newdop" />
         <label>Название галлереи
-            <input type="text" name="rb_gallery-name" value="<?php echo get_option('rb_gallery-name'); ?>" />
+            <input type="text" name="rb_gallery-name" value="" />
         </label>
+        <input type="text" name="rb_gallery-massImgId" value="" /> 
+        <input type="text" name="rb_gallery-type" value="slider" /> 
         <p class="submit">
             <input type="submit" class="button-primary" value="Сохранить" />
         </p>
