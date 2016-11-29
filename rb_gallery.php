@@ -10,78 +10,22 @@ License: GPL2
 */
 ?>
 <?php 
-add_action( 'admin_init', 'true_plugin_init');
 
-global $rb_gallery_db_version;
-$rb_gallery_db_version = "1.0";
+define( 'RBGL_VERSION', '1.0' );
 
-function rb_gallery_db_install () {
-   global $wpdb;
-   global $rb_gallery_db_version;
+define( 'RBGL_REQUIRED_WP_VERSION', '4.4' );
 
-   $table_name = $wpdb->prefix . "rb_gallery";
-   if($wpdb->get_var("show tables like '$table_name'") != $table_name) {
-      
-      $sql = "CREATE TABLE " . $table_name . " (
-	  id smallint unsigned NOT NULL AUTO_INCREMENT,
-      name text NOT NULL,
-	  foto text NOT NULL,
-	  type text NOT NULL,
-	  UNIQUE KEY id (id)
-	);";
+define( 'RBGL_PLUGIN', __FILE__ );
 
-      require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-      dbDelta($sql);
+define( 'RBGL_PLUGIN_BASENAME', plugin_basename( RBGL_PLUGIN ) );
 
-      $rows_affected = $wpdb->insert( $table_name, array( 'time' => current_time('mysql'), 'name' => $welcome_name, 'text' => $welcome_text ) );
- 
-      add_option("rb_gallery_db_version", $rb_gallery_db_version);
+define( 'RBGL_PLUGIN_NAME', trim( dirname( RBGL_PLUGIN_BASENAME ), '/' ) );
 
-   }
-$welcome_name = "Mr. Wordpress";
-  $welcome_text = "Поздравляю, установка прошла успешно!";
+define( 'RBGL_PLUGIN_DIR', untrailingslashit( dirname( RBGL_PLUGIN ) ) );
 
-  $rows_affected = $wpdb->insert( $table_name, array( 'name' => $welcome_name, 'type' => $welcome_text ) );
+define( 'RBGL_PLUGIN_MODULES_DIR', RBGL_PLUGIN_DIR . '/modules' );
 
-}
-
-register_activation_hook(__FILE__,'rb_gallery_db_install');
-
-function rb_gallery_db_uninstall () {
-    global $wpdb;
-    $table_name = $wpdb->prefix . "rb_gallery";
-    
-    $sql = "DROP TABLE " . $table_name . ";";
-    
-    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-    $wpdb->query($sql);
-}
-
-register_deactivation_hook(__FILE__,'rb_gallery_db_uninstall');
-
-
-
-function true_plugin_init() {
-    if ( ! did_action( 'wp_enqueue_media' ) ) {
-		wp_enqueue_media();
-	}
-    wp_enqueue_script('uploadgalleryjs', plugins_url('assets/js/upload_gallery.js', __FILE__), array('jquery'), null, false);
-    wp_enqueue_style('uploadgallerystyle', plugins_url('assets/css/uploadgallerystyle.css', __FILE__));
-}
-
-add_action('admin_menu', 'rb_gallery_MenuCreate');
-
-function rb_gallery_MenuCreate(){
-    if (function_exists('add_menu_page')){
-        
-        $pl_url = plugins_url('rb_gallery/assets/img/icon.png');
-        add_menu_page( 'RB gallery', 'RB gallery', 'manage_options', 'rb_gallery', 'rb_gallery_Home', $pl_url , '20' );
-        
-        add_submenu_page( 'rb_gallery', 'RB gallery 1', 'Настройка', 'manage_options', 'rb_gallery_setting', 'rb_gallery_Setting' );
-        
-    }
-}
-
+require_once RBGL_PLUGIN_DIR . '/setting.php';
 
 /*
 *
@@ -91,13 +35,48 @@ function rb_gallery_MenuCreate(){
 
 function rb_gallery_Home(){
     if(!$_GET["dop"]){
+        
+        global $wpdb;
+        $table_name = $wpdb->prefix . "rb_gallery";
+
+        $GMId = $wpdb->get_col(
+            "
+            SELECT id 
+            FROM $table_name
+            "
+        );
+        
 ?>
     <h2>Главная страница</h2>
+<?php
+        if($GMId) {
+            for($i = 0; $i < count($GMId); ++$i){ 
+                
+                $gallery = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table_name} WHERE `id` = %d LIMIT 1;", $GMId[$i] ));
+                
+                $image_MSrc = explode(",", $gallery->foto);
+                $image_attributes = wp_get_attachment_image_src( $image_MSrc[1], array($w, $h) );
+                $image_Src = $image_attributes[0];
+?>
+                    <form method="get" action="<?php plugins_url('rb_gallery/rb_gallery.php'); ?>">
+                        <div class="rb_gallery-ImgDbLoad">
+                            <img data-src="<?php echo $image_Src; ?>" src="<?php echo $image_Src ?>" width="150px" />
+                        </div>
+                        <input type="hidden" name="page" value="rb_gallery" />
+                        <input type="hidden" name="dop" value="gallery<?php echo $GMId[$i]; ?>" />
+                        <p class="submit">
+                            <input type="submit" class="button-primary" value="перейти в галерею" />
+                        </p>
+                    </form>
+                <?php
+            }
+        }
+?>
 
     <form method="get" action="<?php plugins_url('rb_gallery/rb_gallery.php'); ?>">
         
         <input type="hidden" name="page" value="rb_gallery" />
-        <input type="hidden" name="dop" value="newdop" />
+        <input type="hidden" name="dop" value="gallery" />
         
         <p class="submit">
             <input type="submit" class="button-primary" value="Добавить новую галерею" />
@@ -151,6 +130,13 @@ if($_GET['rb_gallery-name']){
 
         $default = plugins_url('rb_gallery/assets/img/no-image.png');
         
+            global $wpdb;
+            $table_name = $wpdb->prefix . "rb_gallery";
+
+            $gallery = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table_name} WHERE `id` = %d LIMIT 1;", 1 ));
+            
+        
+        
 ?>
 
     <h2>Дополнительная страница</h2>
@@ -158,7 +144,8 @@ if($_GET['rb_gallery-name']){
         <div class="rb_gallery-innerBox">
             <div id="rb_gallery-inner">
                 <?php 
-                    $massImgId = explode(",", get_option('rb_gallery-massImgId'));
+        
+                    $massImgId = explode(",", $gallery->foto);
                     if($massImgId){
                         for($i = 1; $i < count($massImgId); ++$i){ 
                         $image_attributes = wp_get_attachment_image_src( $massImgId[$i], array($w, $h) );
@@ -182,7 +169,7 @@ if($_GET['rb_gallery-name']){
     
     <form method="get" action="<?php plugins_url('rb_gallery/rb_gallery.php'); ?>">
         <input type="hidden" name="page" value="rb_gallery" />
-        <input type="hidden" name="dop" value="newdop" />
+        <input type="hidden" name="dop" value="gallery" />
         <label>Название галлереи
             <input type="text" name="rb_gallery-name" value="" />
         </label>
