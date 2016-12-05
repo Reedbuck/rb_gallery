@@ -9,8 +9,9 @@
 add_action( 'admin_init', 'true_plugin_init');   //Регистрирует хук-событие выполняемый системой. Обьявлять не нужно
 
 function true_plugin_init() {
-    if ( ! did_action( 'wp_enqueue_media' ) ) {   //если не подключена библиотека media_editor, подключаем
-		wp_enqueue_media();
+    
+    if ( !did_action( 'wp_enqueue_media' ) ) {   //если не подключена библиотека media_editor, подключаем
+		add_action( 'admin_enqueue_scripts', 'wp_enqueue_media');
 	}
     // подключение скрипта открытия медиатеки
     wp_enqueue_script('uploadgalleryjs', plugins_url('assets/js/upload_gallery.js', __FILE__), array('jquery'), null, false); 

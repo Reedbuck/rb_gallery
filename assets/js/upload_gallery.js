@@ -18,8 +18,8 @@ jQuery(function($){
             $(button).parent().prev().attr('src', attachment.url);
             
             $(button).prev().val(attachment.id);
-            var fotoMassUrl = '0';
-            var fotoMassId = '0';
+            var fotoMassUrl = '';
+            var fotoMassId = '';
             var cast = $.each(fotomas, function(key, value){
                 fotoUrl = fotomas[key].url;
                 fotoId = fotomas[key].id;
@@ -28,7 +28,8 @@ jQuery(function($){
                 alert(key + ': ' + value);
                 alert(fotoUrl);
                 alert(fotoMassUrl);
-                $("input[name='rb_gallery-massImgId']").val(fotoMassId);
+                var inputvalue = $("input[name='rb_gallery-massImgId']").val();
+                $("input[name='rb_gallery-massImgId']").val(inputvalue + fotoMassId);
                 massive = fotoMassUrl.split(',');
                 
             });

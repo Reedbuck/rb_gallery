@@ -63,7 +63,7 @@ function rb_gallery_Home(){
                             <img data-src="<?php echo $image_Src; ?>" src="<?php echo $image_Src ?>" width="150px" />
                         </div>
                         <input type="hidden" name="page" value="rb_gallery" />
-                        <input type="hidden" name="action" value="gallery" />
+                        <input type="hidden" name="action" value="update" />
                         <input type="hidden" name="gallery-id" value="<?php echo $GMId[$i]; ?>" />
                         <p class="submit">
                             <input type="submit" class="button-primary" value="перейти в галерею" />
@@ -77,7 +77,7 @@ function rb_gallery_Home(){
     <form method="get" action="<?php plugins_url('rb_gallery/rb_gallery.php'); ?>">
         
         <input type="hidden" name="page" value="rb_gallery" />
-        <input type="hidden" name="action" value="gallery" />
+        <input type="hidden" name="action" value="create" />
         
         <p class="submit">
             <input type="submit" class="button-primary" value="Добавить новую галерею" />
@@ -98,8 +98,8 @@ function rb_gallery_Home(){
 * Регистрация опцый в БД
 *
 */
-        if($_GET['rb_gallery-name']){
-            echo "Есть контакт";
+        if($_GET['action'] == 'create' && $_GET['rb_gallery-name']){
+            echo "Новая галлерея создана";
 
             $galleryName = $_GET['rb_gallery-name'];
             $galleryImgId = $_GET['rb_gallery-massImgId'];
@@ -107,19 +107,48 @@ function rb_gallery_Home(){
 
 
             function rb_gallery_register_settings($galleryName, $galleryImgId) {
-                echo "контакт 2";
                 global $wpdb;
-             // подготавливаем данные
-             $galleryName = esc_sql($galleryName);
-             $galleryImgId = esc_sql($galleryImgId);
+                // подготавливаем данные
+                $galleryName = esc_sql($galleryName);
+                $galleryImgId = esc_sql($galleryImgId);
 
-             $table_name = $wpdb->prefix . "rb_gallery";
-            // вставляем строку в таблицу
-             $wpdb->insert( $table_name, array( 'name' => $galleryName, 'foto' => $galleryImgId ));
+                $table_name = $wpdb->prefix . "rb_gallery";
+                // вставляем строку в таблицу
+                $wpdb->insert( $table_name, array( 'name' => $galleryName, 'foto' => $galleryImgId ));
             }
 
 
             do_action( 'create_new_gallery', $galleryName, $galleryImgId );
+        }
+        
+        if($_GET['action'] == 'updates' && $_GET['rb_gallery-name']){
+            echo "Галлерея обновлена";
+
+            $galleryId = $_GET['gallery-id'];
+            $galleryName = $_GET['rb_gallery-name'];
+            $galleryImgId = $_GET['rb_gallery-massImgId'];
+            
+            add_action( 'updates_gallery', 'rb_gallery_register_settings', 10, 3 );
+
+
+            function rb_gallery_register_settings($galleryId, $galleryName, $galleryImgId) {
+                
+                global $wpdb;
+                // подготавливаем данные
+                $galleryId = esc_sql($galleryId);
+                $galleryName = esc_sql($galleryName);
+                $galleryImgId = esc_sql($galleryImgId);
+
+                $table_name = $wpdb->prefix . "rb_gallery";
+                // вставляем строку в таблицу
+                $wpdb->update( $table_name,
+                    array( 'name' => $galleryName, 'foto' => $galleryImgId ),
+                    array( 'id' => $galleryId )
+                );
+            }
+
+
+            do_action( 'updates_gallery', $galleryId, $galleryName, $galleryImgId );
         }
 
 /*
@@ -139,8 +168,11 @@ function rb_gallery_Home(){
         
         
 ?>
-
-    <h2>Дополнительная страница</h2>
+<?php if($gallery){ ?>
+    <h2><?php echo $gallery->name; ?></h2>
+<?php } else { ?>
+    <h2>Создание галлереи</h2>     
+<?php } ?>
     <div>
         <div class="rb_gallery-innerBox">
             <div id="rb_gallery-inner">
@@ -167,20 +199,36 @@ function rb_gallery_Home(){
 			<button type="submit" class="remove_image_button button">&times;</button>
 		</div>
 	</div>
-    
+<?php if($gallery){?>
     <form method="get" action="<?php plugins_url('rb_gallery/rb_gallery.php'); ?>">
         <input type="hidden" name="page" value="rb_gallery" />
-        <input type="hidden" name="action" value="gallery" />
+        <input type="hidden" name="action" value="updates" />
+        <input type="hidden" name="gallery-id" value="<?php echo $_GET['gallery-id']; ?>" />
+        
         <label>Название галлереи
-            <input type="text" name="rb_gallery-name" value="" />
+            <input type="text" name="rb_gallery-name" value="<?php echo $gallery->name; ?>" />
         </label>
-        <input type="text" name="rb_gallery-massImgId" value="" /> 
+        <input type="text" name="rb_gallery-massImgId" value="<?php echo $gallery->foto; ?>" /> 
         <input type="text" name="rb_gallery-type" value="slider" /> 
         <p class="submit">
             <input type="submit" class="button-primary" value="Сохранить" />
         </p>
     </form>
-
+<?php } else {?>
+    <form method="get" action="<?php plugins_url('rb_gallery/rb_gallery.php'); ?>">
+        <input type="hidden" name="page" value="rb_gallery" />
+        <input type="hidden" name="action" value="create" />
+        
+        <label>Название галлереи
+            <input type="text" name="rb_gallery-name" value="" />
+        </label>
+        <input type="text" name="rb_gallery-massImgId" value="<?php echo $gallery->foto; ?>" /> 
+        <input type="text" name="rb_gallery-type" value="slider" /> 
+        <p class="submit">
+            <input type="submit" class="button-primary" value="Сохранить" />
+        </p>
+    </form>
+<?php }?>
 <?php  
     }
 }
@@ -190,8 +238,6 @@ function rb_gallery_Home(){
 function rb_gallery_Setting(){
     echo '<h2>Настройки галереи</h2>';
 } 
-
-/* settings link in plugin management screen */
  
 function rb_gallery_settings_link($actions, $file) {
     

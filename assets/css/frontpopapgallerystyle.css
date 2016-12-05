@@ -1,0 +1,54 @@
+.rb_gallery{
+    text-align: center;
+    margin: 0px 0px 50px 0px;
+    min-height: 200px;
+}
+    
+.rb_gallery-imgBox {
+    width: 16.66666667%;
+    float: left;
+    padding: 5px;
+}
+
+.rb_gallery img {
+    max-width: 100%;
+    float: left;
+}
+
+.rb_gallery .slider{
+    padding-right: 5px;
+    padding-left: 5px;
+    margin-bottom: 50px;
+}
+
+.rb_gallery-image{
+    cursor:pointer;
+}
+
+.rb_gallery-popup {
+    position: fixed;
+    height:100%;
+    width:100%;
+    top:0;
+    left:0;
+    display:none;
+    text-align:center;
+    z-index: 99999;
+}
+
+.rb_gallery-popupBg {
+    background:rgba(0,0,0,0.4);
+    position:absolute;
+    z-index:1;
+    height:100%;
+    width:100%;
+}
+
+.rb_gallery-popupImg {
+    position: relative;
+    margin:0 auto;
+    z-index:2;
+    max-height:90%;
+    max-width:90%;
+    margin:1% 0 0 0;
+}
