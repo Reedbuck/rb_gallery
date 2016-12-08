@@ -234,7 +234,6 @@ function rb_gallery_Home(){
 }
 
 
-
 function rb_gallery_Setting(){
     echo '<h2>Настройки галереи</h2>';
 } 
