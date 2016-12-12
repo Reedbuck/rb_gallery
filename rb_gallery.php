@@ -33,8 +33,6 @@ require_once RBGL_PLUGIN_DIR . '/setting.php';
 *
 */
 
-function rb_gallery_Home(){
-
 
 function rb_gallery_Setting(){
     echo '<h2>Настройки галереи</h2>';

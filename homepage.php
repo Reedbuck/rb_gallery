@@ -1,5 +1,6 @@
 <?php
 
+    function rb_gallery_Home(){
     if(!$_GET["action"]){
         
         global $wpdb;
