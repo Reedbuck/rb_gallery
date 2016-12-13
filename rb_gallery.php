@@ -27,12 +27,6 @@ define( 'RBGL_PLUGIN_MODULES_DIR', RBGL_PLUGIN_DIR . '/modules' );
 
 require_once RBGL_PLUGIN_DIR . '/setting.php';
 
-/*
-*
-* ГЛАВНАЯ
-*
-*/
-
 
 function rb_gallery_Setting(){
     echo '<h2>Настройки галереи</h2>';
