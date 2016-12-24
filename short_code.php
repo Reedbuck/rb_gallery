@@ -1,11 +1,4 @@
 <?php
-
-/*
-*
-* НАЧАЛО ШОРТКОДА
-*
-*/
-
 class foobar_shortcode {
     
     static function init () {
@@ -52,12 +45,4 @@ class foobar_shortcode {
     }
 }
 foobar_shortcode::init();
-
-/*
-*
-* КОНЕЦ ШОРТКОДА
-*
-*/
-
-
 ?>
