@@ -17,6 +17,9 @@
     <h2>Главная страница</h2>
 <?php
         if($GMId) {
+?>
+<div class="rb_container">
+<?php
             for($i = 0; $i < count($GMId); ++$i){ 
                 
                 $gallery = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table_name} WHERE `id` = %d LIMIT 1;", $GMId[$i] ));
@@ -25,6 +28,7 @@
                 $image_attributes = wp_get_attachment_image_src( $image_MSrc[1], array($w, $h) );
                 $image_Src = $image_attributes[0];
 ?>
+    <div class="rb_gallery_sortbox">
                     <form method="get" action="<?php plugins_url('rb_gallery/rb_gallery.php'); ?>">
                         <div class="rb_gallery-ImgDbLoad">
                             <img data-src="<?php echo $image_Src; ?>" src="<?php echo $image_Src ?>" width="150px" />
@@ -36,8 +40,12 @@
                             <input type="submit" class="button-primary" value="перейти в галерею" />
                         </p>
                     </form>
+        </div>
                 <?php
             }
+            ?>
+</div>
+    <?php
         }
 ?>
 

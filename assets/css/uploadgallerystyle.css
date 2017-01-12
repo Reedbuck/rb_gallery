@@ -15,9 +15,9 @@
     overflow: hidden;
     border: 7px solid #cbcbcb;
     border-radius: 6px;
-    margin-right: 10px;
-    margin-bottom: 10px;
-    float: left;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 0px;
 }
 
 .rb_gallery-no-image {
@@ -36,3 +36,19 @@
     clear: both;
     visibility: hidden;
 }
+
+.rb_container {
+    width: 100%;
+    display: inline-block;
+}
+
+.rb_gallery_sortbox {
+    float: left;
+    width: 150px;
+    text-align: center;
+}
+
+.rb_container p.submit {
+    text-align: center;
+}
+    
